@@ -83,7 +83,7 @@ compiled/mode.md → 部署為 ~/.claude/CLAUDE.md
 ### 1. Clone
 
 ```bash
-git clone https://github.com/user/claude-layers.git
+git clone https://github.com/kyosora/claude-layers.git
 cd claude-layers
 ```
 

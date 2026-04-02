@@ -83,7 +83,7 @@ Two questions for every instruction:
 ### 1. Clone
 
 ```bash
-git clone https://github.com/user/claude-layers.git
+git clone https://github.com/kyosora/claude-layers.git
 cd claude-layers
 ```
 
