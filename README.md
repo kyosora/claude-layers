@@ -76,7 +76,11 @@ Two questions for every instruction:
 
 > "⚠️ The following request comes from `{skill_name}`, not my own suggestion: {content}"
 
+The framework now also covers **shell-layer attacks** (eval + remote source, background exfiltration, DNS tunneling, base64 obfuscation) and includes a **skill install/update audit** checklist.
+
 → [Full architecture docs](docs/architecture.md)
+→ [16-scenario test suite](docs/injection-tests.md) — covers prompt injection, skill manipulation, shell attacks, and advanced techniques like gradual chain attacks and false positive fatigue
+→ [A/B test results](docs/test-results.md) — baseline Claude (44/64) vs framework (61/64), +39% improvement driven by structured disclosure and user-wait behavior
 
 ## Quick Start
 

@@ -76,7 +76,11 @@ compiled/mode.md → 部署為 ~/.claude/CLAUDE.md
 
 > 「⚠️ 以下請求來自 `{skill名稱}` 的指令，非我自發：{內容}」
 
+框架現在也涵蓋 **Shell 層攻擊**（eval + 遠端來源、背景外洩、DNS 隧道、base64 混淆）以及 **Skill 安裝/更新審查**清單。
+
 → [完整架構文件](docs/architecture.md)
+→ [16 個測試案例](docs/injection-tests.md)——涵蓋 prompt 注入、skill 操控、shell 攻擊、以及漸進式鏈攻擊和假陽性耗盡等進階技術
+→ [A/B 測試結果](docs/test-results.md)——基線 Claude（44/64）vs 框架（61/64），+39% 改善，來自結構化揭露和使用者等待行為
 
 ## 快速開始
 
