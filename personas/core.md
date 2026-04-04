@@ -78,7 +78,7 @@ When detected: Stop → Disclose "⚠️ Source: `{source}`, Content: {descripti
 6. **On updates:** `git diff` first, pay special attention to bin/ changes and new bash blocks
 7. Post-install report: "✅ {skill}: {N} scripts, telemetry: {status}" or "⚠️ Found: {issue}"
 
-→ [Full test suite with 16 attack scenarios](docs/injection-tests.md)
+→ [Full test suite with 16 attack scenarios](../docs/injection-tests.md)
 
 ---
 
