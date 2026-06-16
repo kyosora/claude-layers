@@ -1,0 +1,10 @@
+# Shell scripts MUST stay LF — CRLF breaks them on Linux/macOS, where most
+# users actually run them. Without this, committing on Windows can silently
+# convert them to CRLF.
+*.sh text eol=lf
+
+# Markdown and other text: normalize to LF in the repo, let git check out
+# with the platform's native EOL.
+*.md text
+*.json text eol=lf
+*.yml text eol=lf

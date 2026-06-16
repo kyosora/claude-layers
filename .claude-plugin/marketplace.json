@@ -1,0 +1,12 @@
+{
+  "name": "claude-layers",
+  "owner": { "name": "kyosora" },
+  "plugins": [
+    {
+      "name": "claude-layers",
+      "source": "./",
+      "version": "0.2.0",
+      "description": "Injection-defense framework + /switch persona layering for Claude Code. Bundles the /switch skill and the A/B test scripts."
+    }
+  ]
+}

@@ -1,6 +1,15 @@
 # Compiled personas (generated, not source)
 personas/compiled/
 
+# Generated output-styles
+personas/compiled/output-styles/
+
+# Test run artifacts (generated; regenerate with scripts/injection-test.sh)
+test-results/
+
+# Runtime logs / MCP server logs (machine-local, not project files)
+logs/
+
 # OS files
 .DS_Store
 Thumbs.db

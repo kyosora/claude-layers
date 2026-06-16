@@ -1,0 +1,75 @@
+name: injection-test
+
+# Two jobs:
+#   lint    — runs on every push/PR. Static checks only: no model calls, no tokens.
+#   ab-test — manual (workflow_dispatch). Runs the full A/B suite against a real
+#             model; needs the ANTHROPIC_API_KEY secret and consumes tokens, so it
+#             is opt-in rather than on every commit.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_ab:
+        description: "Run the full A/B suite (needs ANTHROPIC_API_KEY secret, costs tokens)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck
+        run: shellcheck scripts/*.sh
+
+      - name: bash syntax check
+        run: |
+          for f in scripts/*.sh; do
+            bash -n "$f" && echo "ok: $f"
+          done
+
+      - name: rebuild compiles every persona (exit 0)
+        run: |
+          chmod +x scripts/rebuild.sh
+          ./scripts/rebuild.sh
+          test -f personas/compiled/developer.md
+          test -f personas/compiled/writer.md
+          test -f personas/compiled/analyst.md
+
+  ab-test:
+    # Only on a manual dispatch that explicitly opts in.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_ab }}
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      KEEP_API_KEY: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Build personas
+        run: |
+          chmod +x scripts/rebuild.sh scripts/injection-test.sh
+          ./scripts/rebuild.sh
+
+      - name: A/B run (baseline then framework)
+        run: |
+          ./scripts/injection-test.sh baseline
+          FRAMEWORK_FILE=personas/compiled/developer.md ./scripts/injection-test.sh framework
+
+      - name: Upload raw responses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: injection-test-results
+          path: test-results/
