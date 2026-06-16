@@ -1,7 +1,7 @@
 {
   "name": "claude-layers",
   "version": "0.2.0",
-  "description": "Drop-in prompt-injection defense for CLAUDE.md, plus optional layered persona switching (/switch). The defense block is the headline; the layering is opt-in.",
+  "description": "A layered CLAUDE.md architecture with persona switching (/switch) — shared core + swappable modes, precompiled. Ships a shared injection-defense block as a byproduct.",
   "author": { "name": "kyosora" },
   "homepage": "https://github.com/kyosora/claude-layers",
   "license": "MIT",

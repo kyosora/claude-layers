@@ -1,8 +1,8 @@
-# Advanced: Layered Personas (optional)
+# Setup & the Layered Persona System
 
-> The headline of this repo is the [injection defense block](../DEFENSE.md). You do **not**
-> need any of this page to use it. This is the optional layering system for people who run
-> multiple Claude personas and want one self-contained `CLAUDE.md` per mode.
+The full guide to the heart of this repo: a shared `core` + swappable `mode`s, precompiled
+into one deployable `CLAUDE.md` per persona and switched with `/switch`. For the conceptual
+design, see [architecture.md](architecture.md).
 
 ## What it is
 
@@ -20,11 +20,10 @@ zero runtime merge cost.
 
 **Rule of thumb:** applies to ALL your work → `core`. Only applies when doing X → mode `X`.
 
-## Should you use this, or a native feature?
+## How this relates to native features
 
-This system predates several now-native Claude Code capabilities and overlaps them. Prefer
-the native mechanism when one exists; reach for the layering only for what it still does
-uniquely.
+Some of what the layering does now overlaps platform-native features. Worth knowing so you
+can pick the right tool — and so you know where the layering still earns its keep:
 
 | This repo | Native equivalent (2026) | Reach for the layering when… |
 |-----------|--------------------------|------------------------------|
@@ -63,8 +62,8 @@ Edit `personas/core.md` — your shared foundation. Replace the `[PLACEHOLDERS]`
 - Universal skill bindings with 🔴/🟡 tiers
 - Language preferences
 
-The injection-defense block is already in `core.md` (and mirrored in
-[DEFENSE.md](../DEFENSE.md)); every compiled persona inherits it.
+The injection-defense block is already in `core.md` (and mirrored as the standalone
+[injection-defense.md](injection-defense.md)); every compiled persona inherits it.
 
 ### 2. Create your modes
 
@@ -143,7 +142,6 @@ A mode file only needs what's **different** from core:
 ## File layout
 
 ```
-DEFENSE.md                 ← the paste-ready injection-defense block (the headline)
 personas/
 ├── core.md                ← shared foundation (incl. the defense block)
 ├── examples/              ← developer / writer / analyst templates
@@ -154,6 +152,7 @@ scripts/
 ├── injection-test.sh      ← A/B defense test runner + auto-scorer
 ├── llm-judge.sh           ← optional LLM-judge 4-criterion scorer
 └── make-output-style.sh   ← optional: persona voice → native output-style
+docs/injection-defense.md  ← the standalone defense block (a byproduct of the shared core)
 .claude-plugin/
 ├── plugin.json            ← optional: install as a Claude Code plugin
 └── marketplace.json       ← /plugin marketplace add kyosora/claude-layers

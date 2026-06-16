@@ -1,11 +1,10 @@
 # Architecture
 
-> **The headline asset is the [injection-defense block](../DEFENSE.md)** — see the
-> [Injection Defense](#injection-defense) section below for its design. The layered
-> core+mode system on this page is the *optional* delivery mechanism: a clean way to share
-> one defense core across many personas. If you only want the defense, paste `DEFENSE.md`
-> and skip the rest. For setup of the layering and how it maps to native Claude Code
-> features, see [advanced-setup.md](advanced-setup.md).
+> This is the heart of the repo: the layered **core + mode** system and the `/switch`
+> persona swap it enables. The [injection-defense block](injection-defense.md) is one
+> feature that rides in the shared `core` — see the [Injection Defense](#injection-defense)
+> section for its design. For setup steps and how the layering maps to native Claude Code
+> features, see [setup.md](setup.md).
 
 ## The Problem (that the layering solves)
 
@@ -95,8 +94,9 @@ The execution rule is simple:
 
 ## Injection Defense
 
-> This is the repo's headline asset. The full paste-ready rule block lives in
-> [DEFENSE.md](../DEFENSE.md); this section explains the design behind it.
+> A feature that falls out of the shared `core`: every persona inherits one place to put
+> always-on rules. The full paste-ready block lives in
+> [injection-defense.md](injection-defense.md); this section explains the design behind it.
 
 ### The Problem
 
@@ -142,7 +142,6 @@ Cost per switch: ~50 tokens (one file copy). No context window overhead.
 ## File Layout
 
 ```
-DEFENSE.md                   ← The paste-ready injection-defense block (headline)
 personas/
 ├── core.md                  ← Shared foundation (includes the defense block)
 ├── examples/
@@ -163,5 +162,7 @@ scripts/
 .claude-plugin/
 ├── plugin.json              ← Optional: install as a Claude Code plugin
 └── marketplace.json         ← /plugin marketplace add kyosora/claude-layers
-docs/advanced-setup.md       ← Layered-persona setup + native-feature mapping
+docs/
+├── setup.md                 ← Layered-persona setup + native-feature mapping
+└── injection-defense.md     ← Standalone defense block (byproduct of the shared core)
 ```

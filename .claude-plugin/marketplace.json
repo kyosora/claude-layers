@@ -6,7 +6,7 @@
       "name": "claude-layers",
       "source": "./",
       "version": "0.2.0",
-      "description": "Injection-defense framework + /switch persona layering for Claude Code. Bundles the /switch skill and the A/B test scripts."
+      "description": "Layered CLAUDE.md persona system with /switch (core + mode, precompiled). Bundles the /switch skill, A/B test scripts, and a shared injection-defense block."
     }
   ]
 }

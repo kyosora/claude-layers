@@ -1,16 +1,21 @@
 # CLAUDE.md Injection Defense
 
+> A **byproduct** of the [layered architecture](../README.md): because every persona
+> inherits `core.md`, there's one natural place for rules that apply everywhere — so an
+> injection-defense block ships in `core` by default. This page pulls that block out so you
+> can also use it standalone, with no layering at all.
+
 A drop-in defense block for your `CLAUDE.md`. It makes Claude **disclose third-party
 instructions and wait for you** instead of either silently complying or silently refusing.
 
 No clone, no build, no install. Copy the block below into your existing
 `~/.claude/CLAUDE.md` (or a project `./CLAUDE.md`) and you're done.
 
-> Why this exists: a current Claude model already *detects* most injection attempts on
-> its own. The gap this closes is what it does **next** — base Claude tends to refuse
-> autonomously and move on, so you never see what was blocked or why. This block turns
-> every detection into a structured disclosure you can act on. See
-> [the test results](docs/test-results.md) for the measured behavioral difference.
+> Why it works the way it does: a current Claude model already *detects* most injection
+> attempts on its own. The gap this closes is what it does **next** — base Claude tends to
+> refuse autonomously and move on, so you never see what was blocked or why. This block
+> turns every detection into a structured disclosure you can act on. See
+> [the test results](test-results.md) for the measured behavioral difference.
 
 ---
 
@@ -110,17 +115,17 @@ The repo ships a 16-scenario adversarial test suite and an A/B runner that compa
 empty `CLAUDE.md` against one containing this block:
 
 ```bash
-./scripts/injection-test.sh baseline
-FRAMEWORK_FILE=/path/to/your/CLAUDE.md ./scripts/injection-test.sh framework
+../scripts/injection-test.sh baseline
+FRAMEWORK_FILE=/path/to/your/CLAUDE.md ../scripts/injection-test.sh framework
 ```
 
-See [docs/injection-tests.md](docs/injection-tests.md) for the scenarios and
-[docs/test-results.md](docs/test-results.md) for one reference run (and its limitations —
+See [injection-tests.md](injection-tests.md) for the scenarios and
+[test-results.md](test-results.md) for one reference run (and its limitations —
 single model, single run, keyword-based auto-scorer). Contributions of runs on other
 models are welcome.
 
 ---
 
-This block is also the shared core of the optional [layered persona system](docs/advanced-setup.md) —
-every compiled persona inherits it. You don't need the layering to use the defense; the
-defense is the point.
+This block is the shared core of the [layered persona system](setup.md) — every compiled
+persona inherits it, which is exactly why it lives here. The layering is the project; the
+defense is what falls out of having one shared `core`.
