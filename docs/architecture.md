@@ -151,14 +151,20 @@ personas/
 └── compiled/                ← Precompiled deployment artifacts (gitignored, generated)
 skills/
 └── switch/
-    └── SKILL.md             ← The /switch command
+    └── SKILL.md             ← The /switch command (rebuild / switch / status / undo)
 scripts/
-├── rebuild.sh               ← Batch recompilation
+├── rebuild.sh               ← Batch recompilation (+ validate; --examples)
+├── validate.sh              ← Structural lint of a compiled persona
+├── deploy.sh                ← The ONE safe deploy primitive (validate/backup/atomic/no-op)
+├── switch-test.sh           ← Deterministic, model-free switch-contract tests
+├── init.sh                  ← 2-minute guarded scaffold
+├── persona-align.sh / .ps1  ← Auto-align CLAUDE.md to the cwd's persona (opt-in)
 ├── injection-test.sh        ← A/B defense test runner + auto-scorer
 ├── llm-judge.sh             ← Optional LLM-judge 4-criterion scorer
 └── make-output-style.sh     ← Optional: persona voice → native output-style
+hooks/                       ← SessionStart auto-align hook (plugin-loaded)
 .github/workflows/
-└── injection-test.yml       ← CI: shellcheck lint + manual A/B run
+└── injection-test.yml       ← CI: shellcheck + switch-test + rebuild; manual A/B
 .claude-plugin/
 ├── plugin.json              ← Optional: install as a Claude Code plugin
 └── marketplace.json         ← /plugin marketplace add kyosora/claude-layers

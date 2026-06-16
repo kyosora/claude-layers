@@ -43,11 +43,27 @@ compiled file is a plain concatenation, so deploying a persona is a single file 
 | Command | Effect |
 |---------|--------|
 | `/switch` | List available modes |
-| `/switch developer` | Permanently switch (overwrites `CLAUDE.md`) |
+| `/switch developer` | Permanently switch — validated, backed up, atomic write |
 | `/switch writer this session` | Temporary switch (`CLAUDE.md` unchanged) |
+| `/switch status` | Which mode is active right now |
+| `/switch undo` | Restore the previous `CLAUDE.md` |
 | `/switch rebuild` | Recompile all modes after editing core or mode files |
 
-Cost per switch: ~50 tokens (one file copy). No context-window overhead.
+A switch is still basically a file copy (~50 tokens, no context-window overhead) —
+`scripts/deploy.sh` just makes it non-destructive: it validates the persona, backs
+up the current `CLAUDE.md`, writes atomically, and is a silent no-op when already
+active.
+
+**Proven, not promised.** The switch/layering contract has a deterministic,
+model-free test suite (`scripts/switch-test.sh`, green in CI): rebuild is
+byte-correct, a permanent switch deploys the exact file, a temp switch leaves
+`CLAUDE.md` untouched, and rebuilds are idempotent. (The injection-defense byproduct
+has its own suite — the core carries the same proof weight.)
+
+**Automatic switching (opt-in).** Want the right persona to load per project? Drop a
+`.claude/persona` file (or work under a `…/ws/<persona>/` tree) and the bundled
+SessionStart hook aligns `CLAUDE.md` for you — built on the same safe deploy, a true
+no-op when already aligned. See [docs/setup.md](docs/setup.md).
 
 ## 3. Skill priority tiers
 
@@ -79,23 +95,27 @@ already strong without it.
 
 ## Quick start
 
+Fastest path — scaffold a working setup in one command (non-destructive: it backs up
+any existing `CLAUDE.md` and won't clobber an existing config):
+
 ```bash
-git clone https://github.com/kyosora/claude-layers.git
-cd claude-layers
+git clone https://github.com/kyosora/claude-layers.git && cd claude-layers
+./scripts/init.sh          # scaffolds core + a starter mode, compiles, points persona-config
+./scripts/deploy.sh ~/.claude/personas/compiled/developer.md   # or: /switch developer
+```
 
-# 1. Customize your shared foundation
-$EDITOR personas/core.md          # identity, vault path, skill bindings, the defense block
+Or do it by hand:
 
-# 2. Create modes from the examples
-cp personas/examples/developer.md personas/developer.md
-
-# 3. Compile core + each mode → personas/compiled/
-./scripts/rebuild.sh
-
-# 4. Install the switch skill, then deploy
-cp -r skills/switch ~/.claude/skills/switch
+```bash
+$EDITOR personas/core.md                              # your shared foundation
+cp personas/examples/developer.md personas/developer.md   # instantiate a mode from a template
+./scripts/rebuild.sh                                  # compile personas/*.md → compiled/
+cp -r skills/switch ~/.claude/skills/switch           # install the /switch skill
 /switch developer
 ```
+
+> `personas/examples/` are templates — `rebuild.sh` compiles top-level `personas/*.md`
+> by default (copy a template in first, or use `rebuild.sh --examples`).
 
 Full walkthrough, creating your own modes, and the file layout: **[docs/setup.md](docs/setup.md)**.
 Prefer a one-step install? It also ships as a [Claude Code plugin](.claude-plugin/plugin.json):
