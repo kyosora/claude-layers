@@ -24,7 +24,7 @@ marker() { grep -oE '<!--[[:space:]]*CURRENT_MODE:[[:space:]]*[^ ]+' "$1" 2>/dev
 case "${1:-}" in
   --status)
     if [[ -f "$TARGET" ]]; then
-      m="$(marker "$TARGET")"; echo "Active mode: ${m:-unknown}"
+      m="$(marker "$TARGET" || true)"; echo "Active mode: ${m:-unknown}"
     else echo "No ~/.claude/CLAUDE.md deployed."; fi
     exit 0 ;;
   --undo)
