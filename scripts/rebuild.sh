@@ -32,7 +32,7 @@ for mode_file in "$PERSONAS_DIR"/*.md; do
   cat "$PERSONAS_DIR/core.md" <(printf '\n---\n\n') "$mode_file" > "$COMPILED_DIR/$filename"
 
   echo "  compiled/$filename"
-  ((count++))
+  count=$((count + 1))
 done
 
 # Also compile from examples/ if present
@@ -44,7 +44,7 @@ if [[ -d "$PERSONAS_DIR/examples" ]]; then
     cat "$PERSONAS_DIR/core.md" <(printf '\n---\n\n') "$mode_file" > "$COMPILED_DIR/$filename"
 
     echo "  compiled/$filename (from examples/)"
-    ((count++))
+    count=$((count + 1))
   done
 fi
 
