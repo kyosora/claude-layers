@@ -27,13 +27,20 @@ If `$ARGUMENTS` is empty or unspecified, use Glob to list all `.md` files in `PE
 
 If `$ARGUMENTS` is `rebuild`:
 
-1. Use Glob to list all `.md` files in `PERSONAS_DIR/` (exclude core.md and compiled/)
+Prefer running the repo's `scripts/rebuild.sh "PERSONAS_DIR"` — it compiles every
+top-level mode and validates each output. If doing it manually:
+
+1. Use Glob to list all `.md` files in `PERSONAS_DIR/` top level (exclude core.md, compiled/, and the examples/ subdir)
 2. Read `PERSONAS_DIR/core.md`
 3. For each mode file:
    - Read the file
    - Concatenate: core.md content + `---` separator + mode file content
    - Write to `PERSONAS_DIR/compiled/[mode-name].md`
 4. Report: "Recompiled [N] mode files."
+
+> `personas/examples/` holds TEMPLATES — they are NOT compiled by default (this
+> matches `scripts/rebuild.sh`). To compile them too: `scripts/rebuild.sh --examples`,
+> or copy one into `PERSONAS_DIR/` first.
 
 ### Case C: Temporary switch (`this session`)
 
@@ -54,15 +61,36 @@ If `$ARGUMENTS` is a specific mode name (e.g., `developer`, `writer`) without te
 
 1. Check if `PERSONAS_DIR/compiled/$ARGUMENTS.md` exists (use Glob)
 2. If not, list available modes
-3. If exists, use Bash to copy:
-   ```
-   cp "PERSONAS_DIR/compiled/$ARGUMENTS.md" ~/.claude/CLAUDE.md
-   ```
+3. If exists, deploy it **safely** — never a bare clobber:
+   - Preferred: the repo's deploy primitive (validates, backs up the current
+     CLAUDE.md, writes atomically, no-ops if already active):
+     ```
+     bash <claude-layers>/scripts/deploy.sh "PERSONAS_DIR/compiled/$ARGUMENTS.md"
+     ```
+   - If `deploy.sh` isn't reachable, back up first, then copy:
+     ```
+     mkdir -p ~/.claude/.claude-layers
+     cp ~/.claude/CLAUDE.md ~/.claude/.claude-layers/CLAUDE.md.bak 2>/dev/null || true
+     cp "PERSONAS_DIR/compiled/$ARGUMENTS.md" ~/.claude/CLAUDE.md
+     ```
 4. Report:
    ```
    Switched to [$ARGUMENTS] mode.
    Run /compact to clear old mode from context.
+   Undo with: /switch undo
    ```
+
+### Case E: `status`
+
+If `$ARGUMENTS` is `status`: report the active mode by reading the
+`<!-- CURRENT_MODE: x -->` marker from `~/.claude/CLAUDE.md` (or run
+`scripts/deploy.sh --status`). Report: "Current mode: [x]".
+
+### Case F: `undo`
+
+If `$ARGUMENTS` is `undo`: restore the most recent backup — run
+`scripts/deploy.sh --undo`, or copy `~/.claude/.claude-layers/CLAUDE.md.bak` back
+to `~/.claude/CLAUDE.md`. Report which mode it reverted to.
 
 ## Architecture
 

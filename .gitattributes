@@ -8,3 +8,9 @@
 *.md text
 *.json text eol=lf
 *.yml text eol=lf
+
+# The polyglot hook wrapper MUST be LF: a CRLF would leave a trailing CR on the
+# `CMDBLOCK` heredoc delimiter and break the bash branch.
+*.cmd text eol=lf
+*.ps1 text eol=lf
+
