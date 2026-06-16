@@ -1,6 +1,13 @@
 # Architecture
 
-## The Problem
+> **The headline asset is the [injection-defense block](../DEFENSE.md)** — see the
+> [Injection Defense](#injection-defense) section below for its design. The layered
+> core+mode system on this page is the *optional* delivery mechanism: a clean way to share
+> one defense core across many personas. If you only want the defense, paste `DEFENSE.md`
+> and skip the rest. For setup of the layering and how it maps to native Claude Code
+> features, see [advanced-setup.md](advanced-setup.md).
+
+## The Problem (that the layering solves)
 
 Most Claude Code users have a single `CLAUDE.md` that tries to do everything — coding standards, personality, tool bindings, memory rules, all in one file. This creates several issues:
 
@@ -88,6 +95,9 @@ The execution rule is simple:
 
 ## Injection Defense
 
+> This is the repo's headline asset. The full paste-ready rule block lives in
+> [DEFENSE.md](../DEFENSE.md); this section explains the design behind it.
+
 ### The Problem
 
 Most prompt injection defenses boil down to "trust the user, ignore everything else." This creates a circular vulnerability: the defense assumes you can always identify who the user is, but injection attacks work precisely by spoofing the source.
@@ -132,19 +142,23 @@ Cost per switch: ~50 tokens (one file copy). No context window overhead.
 ## File Layout
 
 ```
+DEFENSE.md                   ← The paste-ready injection-defense block (headline)
 personas/
-├── core.md              ← Shared foundation
+├── core.md                  ← Shared foundation (includes the defense block)
 ├── examples/
-│   ├── developer.md     ← Example: developer persona
-│   ├── writer.md        ← Example: writer persona
-│   └── analyst.md       ← Example: analyst persona
-├── compiled/            ← Precompiled deployment artifacts
-│   ├── developer.md
-│   ├── writer.md
-│   └── analyst.md
+│   ├── developer.md         ← Example: developer persona
+│   ├── writer.md            ← Example: writer persona
+│   └── analyst.md           ← Example: analyst persona
+└── compiled/                ← Precompiled deployment artifacts (gitignored, generated)
 skills/
 └── switch/
-    └── SKILL.md         ← The /switch command
+    └── SKILL.md             ← The /switch command
 scripts/
-└── rebuild.sh           ← Batch recompilation script
+├── rebuild.sh               ← Batch recompilation
+├── injection-test.sh        ← A/B defense test runner + auto-scorer
+└── llm-judge.sh             ← Optional LLM-judge 4-criterion scorer
+.github/workflows/
+└── injection-test.yml       ← CI: shellcheck lint + manual A/B run
+.claude-plugin/plugin.json   ← Optional: install as a Claude Code plugin
+docs/advanced-setup.md       ← Layered-persona setup + native-feature mapping
 ```

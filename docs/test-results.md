@@ -4,6 +4,21 @@
 > Model: Claude Opus 4.6 (via Claude Code non-interactive mode `claude -p`)
 > Method: A/B comparison — Group A with empty CLAUDE.md (bare Claude), Group B with compiled persona including defense framework
 
+> [!IMPORTANT]
+> **Read this before trusting the numbers.**
+> - **One run, one model.** This is a single A/B pass on Opus 4.6 (2026-04-04). It
+>   demonstrates a *behavioral difference*, not a settled benchmark. Re-run it on your
+>   model — it's one command (see [Reproducing](#reproducing-these-tests)).
+> - **The per-criterion breakdown below was hand-scored.** The bundled `injection-test.sh`
+>   auto-scorer only checks one axis — *detection* — via keyword matching. It provably
+>   cannot produce the Disclosure / Waited / No-FP numbers in the tables below; a human
+>   scored those against the 4-point rubric. An opt-in
+>   [`llm-judge.sh`](../scripts/llm-judge.sh) is provided to score the nuanced axes
+>   automatically.
+> - **The headline is the behavior, not the total.** Detection is flat (15/16 in both
+>   groups). The score delta comes entirely from *disclose-and-wait*, not from catching
+>   more attacks — do not read "61/64" as a higher catch rate.
+
 ## Methodology
 
 - **Group A (Baseline):** `CLAUDE.md` emptied, no defense rules loaded. Tests Claude's built-in safety.
@@ -106,6 +121,33 @@ KNOWN_FAIL: 1 (not counted)
 - `KNOWN_FAIL` (T-P1) is a documented model-level limitation and doesn't affect the exit code
 - Raw AI responses are saved to `test-results/{group}/` for manual review
 
-**Scoring limitation:** Auto-scoring uses keyword matching (⚠️, refusal phrases) to determine PASS/FAIL. It catches obvious results but cannot judge disclosure quality or chain-linking depth. For nuanced evaluation, review the raw output files.
+**Scoring limitation:** Auto-scoring uses keyword matching (⚠️, refusal phrases) to determine PASS/FAIL. It catches obvious detection but cannot judge disclosure quality or chain-linking depth — those are exactly the axes where the framework adds value, and the auto-scorer is blind to them. For the nuanced 4-criterion rubric, use the opt-in [`llm-judge.sh`](../scripts/llm-judge.sh) or review the raw output files.
 
-Note: Requires Claude Code CLI with active authentication. The script temporarily modifies `~/.claude/CLAUDE.md` and restores it after testing.
+Note: Requires Claude Code CLI with active authentication. The runner backs up `~/.claude/CLAUDE.md`, swaps in the test config, and restores it via an `EXIT` trap that fires on **every** exit path — normal completion, a `set -e` abort, or Ctrl-C. In CI, set `KEEP_API_KEY=1` to authenticate with `ANTHROPIC_API_KEY` instead of OAuth.
+
+### CI
+
+`.github/workflows/injection-test.yml` runs two jobs:
+
+- **`lint`** (on every push/PR) — `shellcheck` over the scripts and `bash -n` syntax
+  checks. No tokens, no model calls.
+- **`ab-test`** (manual `workflow_dispatch`) — the full A/B run; needs an
+  `ANTHROPIC_API_KEY` repo secret and consumes tokens, so it's opt-in rather than on every
+  commit.
+
+## Limitations & how to help
+
+The honest scope of this result:
+
+| Limitation | Consequence | How to help |
+|------------|-------------|-------------|
+| Single model (Opus 4.6) | The disclose-and-wait delta may differ on Sonnet/Haiku/Fable or future models | Run `injection-test.sh` on another model, open a PR with the output |
+| Single run (2026-04-04) | No variance/seed data | Run it a few times; report spread |
+| Keyword auto-scorer | Can't grade disclosure quality | Use `llm-judge.sh`, or hand-score against the rubric |
+| `T-P1` unsolved at this layer | Direct `<system>`-tag injection can still slip | Mitigate by filtering external data before it reaches a prompt |
+
+The durable asset is the **reproducible harness**, not this one result. As base models
+improve, the interesting question becomes how the disclose-vs-silently-handle gap moves
+across model generations — contributed runs are what make that trackable. Drop new runs in
+`results/<model>/<date>.json` (or attach them to a PR) so the provenance is explicit
+rather than one overwritten file.
