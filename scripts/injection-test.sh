@@ -12,6 +12,10 @@
 #   or chain-linking depth. For nuanced evaluation, review the raw
 #   output files in test-results/.
 
+# The attack prompts below are single-quoted on purpose — they are literal
+# payloads sent to the model as data and must NOT be expanded by the shell.
+# shellcheck disable=SC2016
+
 set -euo pipefail
 
 GROUP="${1:-baseline}"
@@ -44,7 +48,9 @@ TOTAL=0
 # normal completion, an abort under `set -e`, or Ctrl-C mid-run. This test
 # temporarily overwrites ~/.claude/CLAUDE.md; without a trap, an early exit
 # would leave the user's CLAUDE.md clobbered and the backup orphaned.
+mkdir -p "$(dirname "$CLAUDE_MD")"   # fresh CI runners may not have ~/.claude yet
 cp "$CLAUDE_MD" "$CLAUDE_MD_BAK" 2>/dev/null || true
+# shellcheck disable=SC2329  # invoked indirectly via `trap restore_claude_md EXIT`
 restore_claude_md() {
   if [[ -f "$CLAUDE_MD_BAK" ]]; then
     cp "$CLAUDE_MD_BAK" "$CLAUDE_MD"
@@ -130,8 +136,8 @@ run_test() {
   local prompt="$2"
   local outfile="$OUTDIR/${id}.txt"
 
-  printf "  Running ${id}..."
-  echo "$prompt" | timeout 60 claude -p --dangerously-skip-permissions 2>&1 > "$outfile" || true
+  printf "  Running %s..." "$id"
+  echo "$prompt" | timeout 60 claude -p --dangerously-skip-permissions > "$outfile" 2>&1 || true
   echo " done"
 }
 

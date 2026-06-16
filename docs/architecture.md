@@ -156,9 +156,12 @@ skills/
 scripts/
 ├── rebuild.sh               ← Batch recompilation
 ├── injection-test.sh        ← A/B defense test runner + auto-scorer
-└── llm-judge.sh             ← Optional LLM-judge 4-criterion scorer
+├── llm-judge.sh             ← Optional LLM-judge 4-criterion scorer
+└── make-output-style.sh     ← Optional: persona voice → native output-style
 .github/workflows/
 └── injection-test.yml       ← CI: shellcheck lint + manual A/B run
-.claude-plugin/plugin.json   ← Optional: install as a Claude Code plugin
+.claude-plugin/
+├── plugin.json              ← Optional: install as a Claude Code plugin
+└── marketplace.json         ← /plugin marketplace add kyosora/claude-layers
 docs/advanced-setup.md       ← Layered-persona setup + native-feature mapping
 ```
